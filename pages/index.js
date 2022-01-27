@@ -24,6 +24,14 @@ export default function PaginaInicial() {
 
   const router = useRouter();
 
+  function handleLogin(e) {
+    e.preventDefault();
+
+    if (username) {
+      router.push('/chat');
+    }
+  }
+
   function avatar() {
     if (!username) {
       return 'https://i.ibb.co/gSLF9Q5/avatar-default.png';
@@ -67,10 +75,7 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
-            onSubmit={function (e) {
-              e.preventDefault();
-              router.push('/chat');
-            }}
+            onSubmit={handleLogin}
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
