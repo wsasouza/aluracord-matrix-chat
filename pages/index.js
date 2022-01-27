@@ -1,39 +1,7 @@
+import { useState } from 'react';
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
-
-function GlobalStyle() {
-  return (
-    <style global jsx>{`
-      @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        list-style: none;
-      }
-
-      body {
-        font-family: 'Poppins', sans-serif;
-      }
-      /* App fit Height */
-      html,
-      body,
-      #__next {
-        min-height: 100vh;
-        display: flex;
-        flex: 1;
-      }
-      #__next {
-        flex: 1;
-      }
-      #__next > * {
-        flex: 1;
-      }
-      /* ./App fit Height */
-    `}</style>
-  );
-}
 
 function Titulo(props) {
   const Tag = props.tag || 'h1';
@@ -52,11 +20,19 @@ function Titulo(props) {
 }
 
 export default function PaginaInicial() {
-  const username = 'peas';
+  const [username, setUsername] = useState('');
+
+  const router = useRouter();
+
+  function avatar() {
+    if (!username) {
+      return 'https://i.ibb.co/gSLF9Q5/avatar-default.png';
+    }
+    return `https://github.com/${username}.png`;
+  }
 
   return (
     <>
-      <GlobalStyle />
       <Box
         styleSheet={{
           display: 'flex',
@@ -91,6 +67,10 @@ export default function PaginaInicial() {
           {/* Formulário */}
           <Box
             as="form"
+            onSubmit={function (e) {
+              e.preventDefault();
+              router.push('/chat');
+            }}
             styleSheet={{
               display: 'flex',
               flexDirection: 'column',
@@ -114,6 +94,10 @@ export default function PaginaInicial() {
 
             <TextField
               fullWidth
+              onChange={function (event) {
+                const valor = event.target.value;
+                setUsername(valor);
+              }}
               textFieldColors={{
                 neutral: {
                   textColor: appConfig.theme.colors.neutrals[200],
@@ -158,8 +142,9 @@ export default function PaginaInicial() {
                 borderRadius: '50%',
                 marginBottom: '16px',
               }}
-              src={`https://github.com/${username}.png`}
+              src={avatar()}
             />
+
             <Text
               variant="body4"
               styleSheet={{
