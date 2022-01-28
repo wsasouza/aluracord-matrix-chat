@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Box, Button, Text, TextField, Image } from '@skynexui/components';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
+import api from './_services/api';
 
 function Titulo(props) {
   const Tag = props.tag || 'h1';
@@ -19,24 +20,55 @@ function Titulo(props) {
   );
 }
 
+function Error(props) {
+  return (
+    <>
+      <span>{props.children}</span>
+      <style jsx>{`
+        span {
+          display: block;
+          color: #ee0000;
+          margin-top: 8px;
+          font-weight: 300;
+        }
+      `}</style>
+    </>
+  );
+}
+
 export default function PaginaInicial() {
-  const [username, setUsername] = useState('');
+  const [inputData, setInputData] = useState('');
+  const [inputError, setInputError] = useState('');
 
   const router = useRouter();
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
 
-    if (username) {
-      router.push('/chat');
+    if (!inputData) {
+      setInputError('Digite seu username');
+      return;
+    }
+
+    try {
+      const response = await api.get(`users/${inputData}`);
+
+      const { name, avatar_url } = response.data;
+
+      router.push({
+        pathname: '/chat',
+        query: { name, avatar_url },
+      });
+    } catch (err) {
+      setInputError('Não encontrado');
     }
   }
 
   function avatar() {
-    if (!username) {
+    if (!inputData) {
       return 'https://i.ibb.co/gSLF9Q5/avatar-default.png';
     }
-    return `https://github.com/${username}.png`;
+    return `https://github.com/${inputData}.png`;
   }
 
   return (
@@ -98,10 +130,11 @@ export default function PaginaInicial() {
             </Text>
 
             <TextField
+              placeholder="Digite seu username"
               fullWidth
               onChange={function (event) {
                 const valor = event.target.value;
-                setUsername(valor);
+                setInputData(valor);
               }}
               textFieldColors={{
                 neutral: {
@@ -123,6 +156,8 @@ export default function PaginaInicial() {
                 mainColorStrong: appConfig.theme.colors.primary[600],
               }}
             />
+
+            {inputError && <Error>{inputError}</Error>}
           </Box>
           {/* Formulário */}
 
@@ -159,7 +194,7 @@ export default function PaginaInicial() {
                 borderRadius: '1000px',
               }}
             >
-              {username}
+              {inputData}
             </Text>
           </Box>
           {/* Photo Area */}

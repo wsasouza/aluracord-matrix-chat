@@ -1,10 +1,19 @@
 import { Box, Text, TextField, Image, Button } from '@skynexui/components';
 import { useState } from 'react';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 
 export default function ChatPage() {
   const [mensagem, setMensagem] = useState('');
   const [listaDeMensagens, setListaDeMensagens] = useState([]);
+
+  const router = useRouter();
+
+  const {
+    query: { name, avatar_url },
+  } = router;
+
+  console.log(name, avatar_url);
 
   /*
     // Usuário
@@ -20,8 +29,9 @@ export default function ChatPage() {
   function handleNovaMensagem(novaMensagem) {
     const mensagem = {
       id: listaDeMensagens.length + 1,
-      de: 'vanessametonini',
+      de: name,
       texto: novaMensagem,
+      avatar_url,
     };
 
     setListaDeMensagens([mensagem, ...listaDeMensagens]);
@@ -70,13 +80,7 @@ export default function ChatPage() {
           }}
         >
           <MessageList mensagens={listaDeMensagens} />
-          {/* {listaDeMensagens.map((mensagemAtual) => {
-                        return (
-                            <li key={mensagemAtual.id}>
-                                {mensagemAtual.de}: {mensagemAtual.texto}
-                            </li>
-                        )
-                    })} */}
+
           <Box
             as="form"
             styleSheet={{
@@ -117,6 +121,12 @@ export default function ChatPage() {
 }
 
 function Header() {
+  const router = useRouter();
+
+  const {
+    query: { name, avatar_url },
+  } = router;
+
   return (
     <>
       <Box
@@ -129,12 +139,39 @@ function Header() {
         }}
       >
         <Text variant="heading5">Chat</Text>
-        <Button
-          variant="tertiary"
-          colorVariant="neutral"
-          label="Logout"
-          href="/"
-        />
+        <Box
+          styleSheet={{
+            width: '50%',
+            marginBottom: '16px',
+            marginRight: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <Text variant="heading5">{name}</Text>
+          <Image
+            styleSheet={{
+              borderRadius: '50%',
+              marginRight: '16px',
+              marginLeft: '16px',
+              width: '45px',
+              height: '45px',
+            }}
+            src={avatar_url}
+          />
+          <Button
+            iconName="FaPowerOff"
+            href="/"
+            styleSheet={{
+              backgroundColor: appConfig.theme.colors.neutrals['700'],
+              color: '#fff',
+              hover: {
+                background: appConfig.theme.colors.primary[400],
+              },
+            }}
+          />
+        </Box>
       </Box>
     </>
   );
@@ -181,7 +218,7 @@ function MessageList(props) {
                   display: 'inline-block',
                   marginRight: '8px',
                 }}
-                src={`https://github.com/vanessametonini.png`}
+                src={mensagem.avatar_url}
               />
               <Text tag="strong">{mensagem.de}</Text>
               <Text
